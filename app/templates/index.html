@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة مبيعات البدْر</title>
+</head>
+<body>
+    <h1>لوحة مبيعات البدْر</h1>
+    <div id="sales-chart" style="width: 80vw; height: 60vh;"></div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        fetch('/api/sales-data')
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    const labels = data.data.map(row => row[Object.keys(row)[0]]);
+                    const values = data.data.map(row => row[Object.keys(row)[1]]);
+                    const ctx = document.createElement('canvas');
+                    document.getElementById('sales-chart').appendChild(ctx);
+                    new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                label: Object.keys(data.data[0])[1],
+                                data: values,
+                                backgroundColor: 'rgba(54, 162, 235, 0.5)'
+                            }]
+                        }
+                    });
+                } else {
+                    document.getElementById('sales-chart').innerText = 'تعذر تحميل البيانات.';
+                }
+            })
+            .catch(() => {
+                document.getElementById('sales-chart').innerText = 'حدث خطأ أثناء تحميل البيانات.';
+            });
+    </script>
+</body>
+</html> 
